@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "munarium-warden"
+version = "0.1.0-dev"
+edition = "2024"
+rust-version = "1.98"
+license = "Apache-2.0"
+description = "Verified principal chains, claim-bound grants, isolated credential brokering, and bounded revocation."
+repository = "https://github.com/iokaio/munarium-warden"
+readme = "README.md"
+publish = false
+
+[dependencies]
