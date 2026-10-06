@@ -1,6 +1,6 @@
 # Munarium Warden implementation architecture
 
-**Proposed design; scaffold only.** Based on section 9 of the
+**Proposed design with an experimental library implementation.** Based on section 9 of the
 [platform plan, revision 4](https://github.com/iokaio/munarium-platform/blob/main/docs/platform-plan.md), with lifecycle and failure rules in
 sections 17–19 and 22. See the hub's
 [scaffold decision proposal](https://github.com/iokaio/munarium-platform/blob/main/docs/decisions/0001-scaffold-boundaries.md)
@@ -9,13 +9,15 @@ for the distinction between local interfaces and normative contracts.
 ## Responsibility and current boundary
 
 Verified principal chains, claim-bound grants, isolated credential brokering, and bounded revocation. Warden belongs to the **authority plane**.
-The crate declares interfaces only: no concrete implementations, serialization,
-network listeners, persistence, service authentication or target operations exist.
+The crate implements signed identity verification, SQLite issuance and activation,
+suspension and OpenBao retrieval. Its [runtime guide](experimental-runtime.md) states
+the exact trust-adapter boundary. No production listener or target dispatcher exists.
 
-The associated input, output and error types are intentionally unspecified.
-These are proposed in-process seams for implementation work, not a released Rust API
-or a second definition of the shared wire contract. A trait signature does not enforce
-the trust assumptions below. Async runtime, transport and storage choices remain open.
+The original associated-type interfaces remain provisional. Concrete experimental
+types are in `principal`, `authority` and `credential`; they are not a released Rust API
+or a second definition of a shared wire contract. Trait signatures do not enforce
+transport authentication. The experiment uses blocking HTTPS and single-node SQLite;
+the supported platform deployment profile remains open.
 
 ## Module map
 
@@ -30,7 +32,10 @@ the trust assumptions below. Async runtime, transport and storage choices remain
 
 Verify identity with a trusted provider → narrow the delegation chain → validate durable claim and current policy → issue request/audience/time-bound grant → consume under the shared protocol → bind credential only in connector zone. Authenticated suspension narrows admission and outstanding unconsumed grants.
 
-Own grant issuance and consumption/revocation state under the shared protocol, plus identity trust configuration. Use an existing identity provider and secret service. Do not store a new general-purpose vault here or expose target secrets in the authoritative ledger.
+Own issuance, validation and revocation state plus identity trust configuration.
+Under hub ADR 0002, Gate owns atomic consumption and final dispatch admission.
+Use an existing identity provider and secret service. Do not store a new general-purpose
+vault here or expose target secrets in the authoritative ledger.
 
 ## Dependencies and failure behavior
 
@@ -41,7 +46,8 @@ Own grant issuance and consumption/revocation state under the shared protocol, p
 | Registry / Council | Registered scope and permitted authority transitions | An agent-derived chain cannot become a human ratifier. |
 | Secret service / connector host | Narrow target capability in an isolated process | Broker failure stops execution; never fall back to agent-held secrets. |
 
-No dependency is linked into this scaffold. Supported contract versions are **none**.
+Dependencies are pinned in Cargo.lock and listed in the repository notices.
+Released supported contract versions are **none**.
 Future adapters must consume a reviewed, versioned contract and identify its digest;
 a floating hub branch is design context, never deployment authority.
 

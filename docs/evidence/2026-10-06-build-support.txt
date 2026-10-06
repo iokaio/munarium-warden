@@ -1,0 +1,40 @@
+Approved build-support update: 6 October 2026. Local results only; hosted CI not run.
+
+$ rustc --version
+rustc 1.98.1 (48a229cea 2026-09-01)
+
+exit: 0
+
+$ cargo fetch --locked
+
+exit: 0
+
+$ cargo build --offline --locked
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.25s
+
+exit: 0
+
+$ python check_license.py
+check_license (Munarium Warden): texts canonical, 20 source files headed -- ok
+
+exit: 0
+
+$ python scripts/private_material_scan.py
+private_material_scan: clean across 54 files (6 rules + alt-text + image-source; 6 reasoned exception(s))
+
+exit: 0
+
+$ python scripts/docs_linkcheck.py
+docs_linkcheck: 19 markdown files, every link resolves, every page is indexed
+
+exit: 0
+
+$ gitleaks dir . --config .gitleaks.toml --no-banner --redact --exit-code 1
+5:04PM INF scanned ~398578 bytes (398.58 KB) in 70.8ms
+5:04PM INF no leaks found
+
+exit: 0
+
+$ git diff --check
+
+exit: 0

@@ -3,7 +3,10 @@
 //!
 //! Validate issuer, audience, expiry, tenant, delegation depth and narrowing. Self-reported actor arrays are not identity evidence.
 //!
-//! Proposed local interface only. No implementation or wire format is provided.
+//! The experimental implementation is [`crate::principal`]; the original associated-type
+//! interface remains available for consumers. No released wire contract is claimed.
+
+pub use crate::principal::{Delegation, Principal, Trust, TrustedKey, verify};
 
 /// Proposed boundary for: verify identity evidence into a bounded principal context.
 ///
@@ -26,4 +29,16 @@ pub trait IdentityVerifier {
         &self,
         input: &Self::IdentityEvidence,
     ) -> Result<Self::VerifiedPrincipal, Self::Error>;
+}
+
+impl IdentityVerifier for Trust {
+    type IdentityEvidence = Vec<String>;
+    type VerifiedPrincipal = Principal;
+    type Error = crate::error::Error;
+    fn verify(
+        &self,
+        input: &Self::IdentityEvidence,
+    ) -> Result<Self::VerifiedPrincipal, Self::Error> {
+        verify(input, self)
+    }
 }

@@ -5,9 +5,14 @@
 stage sequence in section 25. Warden's initial delivery belongs to **Stage 1 interfaces; 2 action path**.
 Calendar windows are planning targets; acceptance evidence controls advancement.
 
+The current authorized implementation includes identity, grants, brokering, activation
+and suspension in one [experimental runtime slice](experimental-runtime.md). The
+packet sequence below is the original roadmap; its identity-only restriction does
+not describe the present local scope. Full platform milestones remain unqualified.
+
 ## Preparation present in this checkout
 
-- A non-publishable, dependency-free Cargo library with documented interface modules.
+- A non-publishable Cargo library with experimental implementations and pinned dependencies.
 - An [architecture map](architecture.md) naming ownership, trust assumptions and failures.
 - An [acceptance specification](validation.md) and automatic Rust build checks.
 - Existing contribution, security, support and repository-hygiene processes.
@@ -16,6 +21,10 @@ These artifacts prepare implementation; they do not complete Stage 0 foundation 
 or advance this repository beyond the hub's **repository created** catalog state.
 
 ## First work packet: WARDEN-01: verify one identity path and reject widened delegation
+
+The [6 October 2026 readiness record](warden-01-readiness.md) pins the inspected
+hub candidates and maps acceptance cases. Those inputs remain proposed; the authorized
+experiment proceeds without claiming contract acceptance or release readiness.
 
 **Prerequisites:** accepted hub decisions and the specific contracts named in
 [Architecture](architecture.md); record the exact revisions used. All fixtures must be synthetic
