@@ -3,7 +3,10 @@
 //!
 //! Measure admission and outstanding-grant rejection separately; restoration needs its own authorized path.
 //!
-//! Proposed local interface only. No implementation or wire format is provided.
+//! [`crate::authority::Store::suspend`] implements durable, scope-specific suspension.
+//! The original generic interface below remains provisional; it is not a wire format.
+
+pub use crate::authority::{ControlPlane, Scope};
 
 /// Proposed boundary for: narrow authority through an authenticated bounded suspension.
 ///

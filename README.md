@@ -7,12 +7,12 @@ request-bound execution grants against durable claims, brokers the target creden
 connector so the agent never holds it, and suspends an instance, agent version, deployment or tenant
 within a measured bound. It does not replace the enterprise identity provider or secrets manager.
 
-> **Status: Planned — Rust scaffold present.** This checkout contains a dependency-free,
-> non-publishable [Cargo library](Cargo.toml) and documented interfaces under [src/](src/lib.rs).
-> The interfaces have no implementations: no runtime service, client transport, database,
-> provider integration or contract implementation is available. No production path is qualified.
-> Build checks validate source structure, not governance capabilities. The
-> [capability table](#capability-status) remains the authoritative functional status.
+> **Status: Experimental — authority library implemented.** The non-publishable
+> [Rust library](src/lib.rs) verifies signed principals, persists grants and activation
+> epochs, enforces suspension, and retrieves credentials from OpenBao for trusted
+> connector delivery. [Behavioral tests](docs/experimental-runtime.md) exercise real
+> SQLite persistence and a disposable vault. No production deployment, released wire
+> contract or complete platform composition is qualified.
 
 Warden is one of nine components built around the existing Munarium foundation, Munarium Server
 and Munarium Matrix. Their shared architecture, normative contracts, decision records, roadmap and
@@ -27,7 +27,8 @@ source from its first public commit, under the Apache License 2.0, with no propr
 Read the [development index](docs/README.md), then the [architecture](docs/architecture.md),
 [implementation plan](docs/implementation-plan.md) and [validation guide](docs/validation.md).
 They map the public platform plan to source modules, dependencies, a first bounded work item
-and acceptance cases. Runtime capabilities remain planned; supported contract versions are **none**.
+and acceptance cases. Start the [experimental runtime](docs/experimental-runtime.md)
+with the local test commands. Released supported contract versions remain **none**.
 
 ## What Warden is for
 
@@ -127,19 +128,22 @@ repository is at **repository created**.
 
 | Capability | Status | Evidence |
 |---|---|---|
-| Principal model and verified actor chains (issuer, audience, expiry, tenant, depth, allowed transitions) | Planned | none |
+| Principal model and verified actor chains (issuer, audience, expiry, tenant, depth, allowed transitions) | Experimental | [Ed25519 and pinned-vector tests](tests/principal.rs); non-human decision profile only |
 | One identity federation path with a reference identity provider | Planned | none |
-| Request-bound, claim-bound, audience-bound execution grants with atomic consumption | Planned | none |
-| One isolated credential broker path (local test vault or agreed cloud secret service) | Planned | none |
-| Connector assurance metadata describing the credential type and residual risk | Planned | none |
-| Suspension by instance, agent version, deployment or tenant, with a published revocation bound | Planned | none |
+| Request-bound, claim-bound, audience-bound execution grants with atomic consumption | Experimental issuance; Gate consumption integration pending | [Durable issuance and validation tests](tests/authority.rs) |
+| One isolated credential broker path (local test vault or agreed cloud secret service) | Experimental; OS security boundary unqualified | [OpenBao and child-process tests](tests/broker.rs) |
+| Connector assurance metadata describing the credential type and residual risk | Experimental | [Receipt labels a reusable secret](src/credential.rs) |
+| Suspension by instance, agent version, deployment or tenant, with a published revocation bound | Experimental local enforcement; distributed bound unqualified | [Persistent scope tests](tests/authority.rs) |
+| Warden activation epoch and mode installation | Experimental | [Scoped, idempotent activation tests](tests/authority.rs); Council/barrier authentication supplied by trusted adapters |
 | Authenticated circuit-breaker requests under pre-authorized policy | Planned | none |
 | Signing-key rotation preserving historical verification; recorded recovery ceremony | Planned | none |
 | Sender-constrained tokens (mutual TLS, DPoP) where the target supports them | Planned, later | none |
 | HSM integration, multiple PAM vendors, broad workload federation | Deferred | none |
 
-Supported contract versions: **none**. Supported identity providers and secret services: **none**.
-Operations available today: **none**.
+Released contract versions: **none**. External identity federation remains unsupported.
+OpenBao KV v2 has a [disposable integration test](docs/experimental-runtime.md).
+Available library operations: principal verification, issuance, online validation,
+activation installation, suspension, and broker delivery. No production listener is supplied.
 
 ## Acceptance evidence for the first release
 
@@ -218,8 +222,8 @@ Credential isolation and required distinct authority are never removed to preser
 
 | Path | What exists |
 |---|---|
-| [Cargo.toml](Cargo.toml), [Cargo.lock](Cargo.lock) | Independent library, version 0.1.0-dev, publishing disabled, no external crate dependencies |
-| [src/lib.rs](src/lib.rs) | Documented proposed module interfaces; no runtime implementations |
+| [Cargo.toml](Cargo.toml), [Cargo.lock](Cargo.lock) | Independent library, version 0.1.0-dev, publishing disabled, exact direct dependency pins |
+| [src/lib.rs](src/lib.rs) | Experimental implementations and documented trust adapters |
 | [docs/](docs/README.md) | Architecture, implementation sequence and acceptance specifications |
 | [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md) | Contribution process and aligned development guidance |
 | [.github/workflows/](.github/workflows/) | Automatic Rust, repository-hygiene and DCO checks |
@@ -227,14 +231,16 @@ Credential isolation and required distinct authority are never removed to preser
 | [LICENSE](LICENSE), [NOTICE](NOTICE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | Licensing and dependency notices |
 
 Subsystem modules: [identity](src/identity.rs), [grants](src/grants.rs), [broker](src/broker.rs), [revocation](src/revocation.rs).
-Tests, fixtures, migrations, binaries and deployment assets arrive with the implementation that
-uses them. The scaffold defines no shared wire types and depends on no sibling checkout.
+Behavioral tests and public fixtures live under [tests/](tests/). SQLite schema creation
+belongs to the authority store. The library defines no released shared wire types and
+depends on no sibling checkout.
 
 ## Development
 
 Use Rust 1.98.1 with rustfmt, Clippy and the platform's native linker. From this repository root:
 
 ```console
+cargo fetch --locked
 cargo fmt --all --check
 cargo build --offline --locked
 cargo clippy --offline --locked --all-targets -- -D warnings
@@ -242,9 +248,9 @@ cargo test --offline --locked
 cargo doc --offline --locked --no-deps
 ```
 
-The crate currently has **zero runtime or conformance tests**. A successful test command checks
-the scaffold only. The [validation guide](docs/validation.md) gives the required behavioral
-test specifications and explains how to retain evidence when they are implemented.
+The [validation guide](docs/validation.md) separates ordinary behavioral tests,
+the opt-in Docker integration and remaining composition requirements. Fetch populates
+the dependency cache; subsequent Rust gates run offline against the lockfile.
 
 Also run the existing hygiene gates:
 

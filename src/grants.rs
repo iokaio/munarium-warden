@@ -3,7 +3,10 @@
 //!
 //! A grant must bind exact request, audience, scope and time. Its single-use property depends on atomic consumption, not on a signature alone.
 //!
-//! Proposed local interface only. No implementation or wire format is provided.
+//! [`crate::authority::Store`] implements durable issuance and online validation.
+//! The original generic interface below remains provisional; it is not a wire format.
+
+pub use crate::authority::{Binding, Grant, Store, Ticket};
 
 /// Proposed boundary for: issue authority against a verified durable claim.
 ///

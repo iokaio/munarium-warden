@@ -1,13 +1,14 @@
 # Munarium Warden validation
 
-## Build the scaffold locally
+## Build and test locally
 
 Use Rust **1.98.1** with Cargo, rustfmt and Clippy, plus the platform's native linker.
-The manifest requires Rust 1.98; older toolchains are not qualified by this scaffold.
-CI installs 1.98.1 explicitly. No provider account, database, model key, container, sibling
-checkout or downloaded crate is needed for these commands from the repository root:
+The manifest requires Rust 1.98. CI installs 1.98.1 explicitly. Fetch the pinned public
+dependencies once; then ordinary tests need no provider account, external database,
+model key, container or sibling checkout:
 
 ```console
+cargo fetch --locked
 cargo fmt --all --check
 cargo build --offline --locked
 cargo clippy --offline --locked --all-targets -- -D warnings
@@ -16,12 +17,12 @@ cargo doc --offline --locked --no-deps
 ```
 
 `Cargo.lock` is checked in. Do not regenerate it to bypass a locked-build failure.
-The initial lock contains only this package. When external dependencies arrive, pin and
-review them and revise the offline setup instructions to identify the required cache.
+The lock pins the complete dependency graph. Direct pins and license inventory are
+recorded in [third-party notices](../THIRD_PARTY_NOTICES.md).
 
-Build and lint validate the interface declarations. **There are no runtime implementations,
-unit tests or conformance tests yet.** A successful `cargo test` with zero tests is only
-a scaffold check; the acceptance cases below are specifications, not executed evidence.
+Behavioral tests exercise signed identity, durable grants, activation, suspension,
+recovery and broker failure paths. The [runtime guide](experimental-runtime.md) provides
+the separate real OpenBao test command and documents which boundaries remain fixtures.
 `cargo doc` produces local API documentation under `target/doc/`.
 
 Run the existing repository checks too:
@@ -48,7 +49,9 @@ The existing [hygiene workflow](../.github/workflows/repo-hygiene.yml) and
 
 ## Required behavioral acceptance cases
 
-These are **not implemented**. Invariant IDs refer to the catalog in
+These are **full-composition requirements**, only partly covered by the local tests.
+See the [retained run](evidence/2026-10-06-local.txt) for actual commands and outcomes.
+Invariant IDs refer to the catalog in
 [platform plan revision 4, Appendix C](https://github.com/iokaio/munarium-platform/blob/main/docs/platform-plan.md) and the
 [hub catalog](https://github.com/iokaio/munarium-platform/blob/main/README.md#the-invariant-catalog). No contract bundle has been released.
 
@@ -63,7 +66,7 @@ These are **not implemented**. Invariant IDs refer to the catalog in
 INV-21 (protected development authority) and INV-22 (claims bounded by evidence)
 apply to every packet in addition to the component-specific cases.
 
-## Evidence to retain when the tests exist
+## Evidence to retain
 
 Record source and contract digests, toolchain, fixture identifiers, command/exit status,
 environment, declared trust boundary, expected and actual outcome, and remaining gaps.
@@ -73,4 +76,5 @@ authorization and qualification record.
 
 Keep operational credentials and raw private payloads out of test artifacts. Distinguish
 a local pass, unavailable coverage, a failing case, and an independently reviewed result.
-No capability-status or invariant-evidence field advances from the scaffold checks.
+Capability status must identify the boundary actually exercised; a local library or
+child-process test does not qualify the platform's production invariants.

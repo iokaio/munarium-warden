@@ -37,8 +37,9 @@ evidence is not useful capacity because it arrived through a pull request.
 2. Run the gates below. Every new source file carries `SPDX-License-Identifier: Apache-2.0` on its
    first line, the second after a shebang or an XML declaration, and `check_license.py` names any
    file that does not.
-3. Open a pull request against `main`. Public CI runs offline with no private credential. Nothing in
-   a pull request can reach a registry, a deployment, a signing key or an activated policy; anything
+3. Open a pull request against `main`. Public CI fetches locked public dependencies, then runs
+   checks offline with no private credential. Nothing in a pull request can reach a platform
+   registry, a deployment, a signing key or an activated policy; anything
    that needs a deployed environment runs on `main` after merge, never on a pull request from a fork.
 4. A code owner reviews ([.github/CODEOWNERS](.github/CODEOWNERS)); Ioka squash-merges. External
    pull requests never gain deployment or release authority.
@@ -69,9 +70,10 @@ declared version policy.
 
 Use `python` or `python3` where `py` is unavailable. Rust checks use 1.98.1 with rustfmt
 and Clippy; the new [Rust workflow](.github/workflows/rust.yml) installs that version explicitly.
-The crate has no external dependencies; commit the lockfile and review/pin dependencies when
-implementation introduces them. [Validation](docs/validation.md) distinguishes scaffold checks
-from future acceptance tests. There are no runtime or conformance tests yet.
+Run `cargo fetch --locked` once to populate the dependency cache before the offline gates.
+Commit the lockfile, pin direct dependencies and review their provenance and licenses.
+[Validation](docs/validation.md) distinguishes local behavioral tests, the opt-in OpenBao
+integration and remaining platform qualification. No production path is qualified.
 The workflows under `.github/workflows/` are the source of truth for automatic coverage.
 Add component conformance coverage with each behavior; keep existing automatic suites intact.
 

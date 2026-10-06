@@ -3,7 +3,10 @@
 //!
 //! The output belongs only in the connector privilege domain. Do not expose raw target secrets through agent APIs, diagnostics, or derived Debug output.
 //!
-//! Proposed local interface only. No implementation or wire format is provided.
+//! [`crate::credential`] implements OpenBao retrieval and protected connector delivery.
+//! The original generic interface below remains provisional; it is not a wire format.
+
+pub use crate::credential::{Connector, Credential, OpenBao, Receipt, SecretProvider, deliver};
 
 /// Proposed boundary for: bind target authority to an isolated connector.
 ///
