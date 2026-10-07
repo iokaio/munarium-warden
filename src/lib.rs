@@ -13,6 +13,7 @@
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 
+pub mod admission;
 pub mod authority;
 pub mod broker;
 pub mod credential;
@@ -20,5 +21,6 @@ pub mod encoding;
 pub mod error;
 pub mod grants;
 pub mod identity;
+pub mod policy;
 pub mod principal;
 pub mod revocation;
