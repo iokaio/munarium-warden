@@ -7,12 +7,11 @@ request-bound execution grants against durable claims, brokers the target creden
 connector so the agent never holds it, and suspends an instance, agent version, deployment or tenant
 within a measured bound. It does not replace the enterprise identity provider or secrets manager.
 
-> **Status: Experimental — authority library implemented.** The non-publishable
-> [Rust library](src/lib.rs) verifies signed principals, persists grants and activation
-> epochs, enforces suspension, and retrieves credentials from OpenBao for trusted
-> connector delivery. [Behavioral tests](docs/experimental-runtime.md) exercise real
-> SQLite persistence and a disposable vault. No production deployment, released wire
-> contract or complete platform composition is qualified.
+> **Status: Stage 1 identity service implemented.** The authenticated service/client
+> profile is implemented and covered by component and separate-process tests.
+> See the [service profile](docs/service-profile.md). Candidates remain inactive;
+> no execution endpoint is mounted. Human acceptance and production qualification
+> remain pending.
 
 Warden is one of nine components built around the existing Munarium foundation, Munarium Server
 and Munarium Matrix. Their shared architecture, normative contracts, decision records, roadmap and

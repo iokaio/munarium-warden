@@ -235,3 +235,61 @@ fn current_policy_key_purpose_and_service_origin_are_preserved() {
     t.not_before = 999;
     assert!(verify(&chain, &t).is_err());
 }
+
+#[test]
+fn intermediate_presenter_and_every_ancestor_interval_are_bound() {
+    let k = key();
+    let mut t = trust(&k, 1000);
+    let root = sign(&k, &payload());
+    let mut middle = payload();
+    middle["actor"] = json!("agent-b");
+    middle["service"] = json!("svc-middle");
+    middle["parent_digest"] = json!(digest(root.as_bytes()));
+    middle["exp"] = json!(1035);
+    let mid = sign(&k, &middle);
+    let mut leaf = middle.clone();
+    leaf["actor"] = json!("agent-c");
+    leaf["service"] = json!("svc-harness");
+    leaf["parent_digest"] = json!(digest(mid.as_bytes()));
+    leaf["exp"] = json!(1030);
+    let chain = vec![root, mid, sign(&k, &leaf)];
+    for (from, to, service) in [
+        ("agent-a", "agent-b", "svc-middle"),
+        ("agent-b", "agent-c", "svc-harness"),
+    ] {
+        t.delegations.push(Delegation {
+            registration_id: format!("edge-{from}-{to}"),
+            deployment: "fixture".into(),
+            tenant: "alpha".into(),
+            origin_kind: "agent".into(),
+            audience: "svc-gate".into(),
+            task_digest: digest(b"task"),
+            policy_digest: digest(b"policy"),
+            origin: "agent-a".into(),
+            from: from.into(),
+            to: to.into(),
+            service: service.into(),
+            scopes: vec!["evaluate".into()],
+            resources: vec!["item-a".into()],
+            not_before: 900,
+            expires: 1100,
+            maximum_depth: 4,
+        });
+    }
+    assert!(verify(&chain, &t).is_ok());
+    t.delegations[0].service = "svc-harness".into();
+    assert!(verify(&chain, &t).is_err());
+    t.delegations[0].service = "svc-middle".into();
+    t.expires = 1037;
+    assert!(verify(&chain, &t).is_err(), "root outlives policy");
+    t.expires = 1100;
+    middle["nbf"] = json!(985);
+    let mid = sign(&k, &middle);
+    leaf["nbf"] = json!(990);
+    leaf["parent_digest"] = json!(digest(mid.as_bytes()));
+    t.not_before = 983;
+    assert!(
+        verify(&[chain[0].clone(), mid, sign(&k, &leaf)], &t).is_err(),
+        "root predates task"
+    );
+}

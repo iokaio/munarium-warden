@@ -1,14 +1,20 @@
 # Third-party notices
 
-The experimental library uses the exact direct versions in Cargo.toml and the transitive versions and checksums in Cargo.lock. No dependency source is vendored here. Packages come from crates.io; their upstream repositories and declared license expressions are listed below. Cargo downloads carry their original license and notice files. Preserve those files when redistributing dependencies or binaries; this inventory does not replace their license terms.
+The additional Stage 1 [identity-only package inventory](identity-core/THIRD_PARTY_NOTICES.md)
+covers its separate locked dependency graph. The inventory below remains scoped to the
+original complete Warden package.
 
-This inventory covers all 172 locked dependency packages, including development and target-specific packages. It was generated from `cargo metadata --offline --locked --format-version 1` on 6 October 2026. The manifest pins direct dependencies; the lockfile pins transitives. Review found no missing license expressions. An automated vulnerability audit was unavailable (`cargo audit` is not installed); no exhaustive security or legal certification is claimed.
+The service and library use the exact direct versions in Cargo.toml and the transitive versions and checksums in Cargo.lock. No dependency source is vendored here. Packages come from crates.io; their upstream repositories and declared license expressions are listed below. Cargo downloads carry their original license and notice files. Preserve those files when redistributing dependencies or binaries; this inventory does not replace their license terms.
+
+This inventory covers all 181 locked dependency packages, including development and target-specific packages. It was generated from `cargo metadata --offline --locked --format-version 1` on 6 October 2026. The manifest pins direct dependencies; the lockfile pins transitives. Review found no missing license expressions. An automated vulnerability audit was unavailable (`cargo audit` is not installed); no exhaustive security or legal certification is claimed.
 
 The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munarium platform hub; its exact revision and digest are recorded in tests/fixtures/README.md. No signing material is included.
 
-| Crate | Version | Declared license | Upstream |
+| Package | Version | Declared license | Upstream |
 |---|---|---|---|
 | atomic-waker | 1.1.2 | Apache-2.0 OR MIT | [source](https://github.com/smol-rs/atomic-waker) |
+| axum | 0.8.9 | MIT | [source](https://github.com/tokio-rs/axum) |
+| axum-core | 0.5.6 | MIT | [source](https://github.com/tokio-rs/axum) |
 | base64 | 0.22.1 | MIT OR Apache-2.0 | [source](https://github.com/marshallpierce/rust-base64) |
 | base64 | 0.23.1 | MIT OR Apache-2.0 | [source](https://github.com/marshallpierce/rust-base64) |
 | base64ct | 1.8.3 | Apache-2.0 OR MIT | [source](https://github.com/RustCrypto/formats) |
@@ -17,8 +23,8 @@ The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munar
 | bumpalo | 3.20.3 | MIT OR Apache-2.0 | [source](https://github.com/fitzgen/bumpalo) |
 | bytes | 1.12.1 | MIT | [source](https://github.com/tokio-rs/bytes) |
 | cc | 1.6.0 | MIT OR Apache-2.0 | [source](https://github.com/rust-lang/cc-rs) |
-| cfg_aliases | 0.2.2 | MIT | [source](https://github.com/katharostech/cfg_aliases) |
 | cfg-if | 1.0.5 | MIT OR Apache-2.0 | [source](https://github.com/rust-lang/cfg-if) |
+| cfg_aliases | 0.2.2 | MIT | [source](https://github.com/katharostech/cfg_aliases) |
 | chacha20 | 0.10.2 | MIT OR Apache-2.0 | [source](https://github.com/RustCrypto/stream-ciphers) |
 | const-oid | 0.9.6 | Apache-2.0 OR MIT | [source](https://github.com/RustCrypto/formats/tree/master/const-oid) |
 | cpufeatures | 0.2.17 | MIT OR Apache-2.0 | [source](https://github.com/RustCrypto/utils) |
@@ -55,6 +61,7 @@ The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munar
 | http-body | 1.1.0 | MIT | [source](https://github.com/hyperium/http-body) |
 | http-body-util | 0.1.5 | MIT | [source](https://github.com/hyperium/http-body) |
 | httparse | 1.10.1 | MIT OR Apache-2.0 | [source](https://github.com/seanmonstar/httparse) |
+| httpdate | 1.0.3 | MIT OR Apache-2.0 | [source](https://github.com/pyfisch/httpdate) |
 | hyper | 1.12.0 | MIT | [source](https://github.com/hyperium/hyper) |
 | hyper-rustls | 0.27.10 | Apache-2.0 OR ISC OR MIT | [source](https://github.com/rustls/hyper-rustls) |
 | hyper-util | 0.1.21 | MIT | [source](https://github.com/hyperium/hyper-util) |
@@ -76,7 +83,9 @@ The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munar
 | litemap | 0.8.3 | Unicode-3.0 | [source](https://github.com/unicode-org/icu4x) |
 | log | 0.4.34 | MIT OR Apache-2.0 | [source](https://github.com/rust-lang/log) |
 | lru-slab | 0.1.3 | MIT OR Apache-2.0 OR Zlib | [source](https://github.com/Ralith/lru-slab) |
+| matchit | 0.8.4 | MIT AND BSD-3-Clause | [source](https://github.com/ibraheemdev/matchit) |
 | memchr | 2.8.3 | Unlicense OR MIT | [source](https://github.com/BurntSushi/memchr) |
+| mime | 0.3.17 | MIT OR Apache-2.0 | [source](https://github.com/hyperium/mime) |
 | mio | 1.2.4 | MIT | [source](https://github.com/tokio-rs/mio) |
 | once_cell | 1.21.4 | MIT OR Apache-2.0 | [source](https://github.com/matklad/once_cell) |
 | percent-encoding | 2.3.2 | MIT OR Apache-2.0 | [source](https://github.com/servo/rust-url/) |
@@ -98,10 +107,11 @@ The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munar
 | reqwest | 0.12.28 | MIT OR Apache-2.0 | [source](https://github.com/seanmonstar/reqwest) |
 | ring | 0.17.14 | Apache-2.0 AND ISC | [source](https://github.com/briansmith/ring) |
 | rusqlite | 0.37.0 | MIT | [source](https://github.com/rusqlite/rusqlite) |
-| rustc_version | 0.4.1 | MIT OR Apache-2.0 | [source](https://github.com/djc/rustc-version-rs) |
 | rustc-hash | 2.1.3 | Apache-2.0 OR MIT | [source](https://github.com/rust-lang/rustc-hash) |
+| rustc_version | 0.4.1 | MIT OR Apache-2.0 | [source](https://github.com/djc/rustc-version-rs) |
 | rustix | 1.1.5 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | [source](https://github.com/bytecodealliance/rustix) |
 | rustls | 0.23.45 | Apache-2.0 OR ISC OR MIT | [source](https://github.com/rustls/rustls) |
+| rustls-pemfile | 2.2.0 | Apache-2.0 OR ISC OR MIT | [source](https://github.com/rustls/pemfile) |
 | rustls-pki-types | 1.15.1 | MIT OR Apache-2.0 | [source](https://github.com/rustls/pki-types) |
 | rustls-webpki | 0.103.15 | ISC | [source](https://github.com/rustls/webpki) |
 | rustversion | 1.0.23 | MIT OR Apache-2.0 | [source](https://github.com/dtolnay/rustversion) |
@@ -111,9 +121,11 @@ The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munar
 | serde_core | 1.0.228 | MIT OR Apache-2.0 | [source](https://github.com/serde-rs/serde) |
 | serde_derive | 1.0.228 | MIT OR Apache-2.0 | [source](https://github.com/serde-rs/serde) |
 | serde_json | 1.0.149 | MIT OR Apache-2.0 | [source](https://github.com/serde-rs/json) |
+| serde_path_to_error | 0.1.20 | MIT OR Apache-2.0 | [source](https://github.com/dtolnay/path-to-error) |
 | serde_urlencoded | 0.7.1 | MIT/Apache-2.0 | [source](https://github.com/nox/serde_urlencoded) |
 | sha2 | 0.10.9 | MIT OR Apache-2.0 | [source](https://github.com/RustCrypto/hashes) |
 | shlex | 2.0.1 | MIT OR Apache-2.0 | [source](https://github.com/comex/rust-shlex) |
+| signal-hook-registry | 1.4.8 | MIT OR Apache-2.0 | [source](https://github.com/vorner/signal-hook) |
 | signature | 2.2.0 | Apache-2.0 OR MIT | [source](https://github.com/RustCrypto/traits/tree/master/signature) |
 | slab | 0.4.12 | MIT | [source](https://github.com/tokio-rs/slab) |
 | smallvec | 1.16.2 | MIT OR Apache-2.0 | [source](https://github.com/servo/rust-smallvec) |
@@ -130,8 +142,9 @@ The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munar
 | thiserror-impl | 2.0.21 | MIT OR Apache-2.0 | [source](https://github.com/dtolnay/thiserror) |
 | tinystr | 0.8.4 | Unicode-3.0 | [source](https://github.com/unicode-org/icu4x) |
 | tinyvec | 1.13.3 | Zlib OR Apache-2.0 OR MIT | [source](https://github.com/Lokathor/tinyvec) |
-| tokio | 1.53.2 | MIT | [source](https://github.com/tokio-rs/tokio) |
-| tokio-rustls | 0.26.6 | MIT OR Apache-2.0 | [source](https://github.com/rustls/tokio-rustls) |
+| tokio | 1.53.1 | MIT | [source](https://github.com/tokio-rs/tokio) |
+| tokio-macros | 2.7.2 | MIT | [source](https://github.com/tokio-rs/tokio) |
+| tokio-rustls | 0.26.4 | MIT OR Apache-2.0 | [source](https://github.com/rustls/tokio-rustls) |
 | tower | 0.5.3 | MIT | [source](https://github.com/tower-rs/tower) |
 | tower-http | 0.6.11 | MIT | [source](https://github.com/tower-rs/tower-http) |
 | tower-layer | 0.3.3 | MIT | [source](https://github.com/tower-rs/tower) |
@@ -157,6 +170,10 @@ The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munar
 | web-sys | 0.3.106 | MIT OR Apache-2.0 | [source](https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/web-sys) |
 | web-time | 1.1.0 | MIT OR Apache-2.0 | [source](https://github.com/daxpedda/web-time) |
 | webpki-roots | 1.0.9 | CDLA-Permissive-2.0 | [source](https://github.com/rustls/webpki-roots) |
+| windows-link | 0.2.1 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
+| windows-sys | 0.52.0 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
+| windows-sys | 0.61.2 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
+| windows-targets | 0.52.6 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
 | windows_aarch64_gnullvm | 0.52.6 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
 | windows_aarch64_msvc | 0.52.6 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
 | windows_i686_gnu | 0.52.6 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
@@ -165,10 +182,6 @@ The signed JSON fixture in tests/fixtures comes from the public Apache-2.0 Munar
 | windows_x86_64_gnu | 0.52.6 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
 | windows_x86_64_gnullvm | 0.52.6 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
 | windows_x86_64_msvc | 0.52.6 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
-| windows-link | 0.2.1 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
-| windows-sys | 0.52.0 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
-| windows-sys | 0.61.2 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
-| windows-targets | 0.52.6 | MIT OR Apache-2.0 | [source](https://github.com/microsoft/windows-rs) |
 | wit-bindgen | 0.57.1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | [source](https://github.com/bytecodealliance/wit-bindgen) |
 | writeable | 0.6.4 | Unicode-3.0 | [source](https://github.com/unicode-org/icu4x) |
 | yoke | 0.8.3 | Unicode-3.0 | [source](https://github.com/unicode-org/icu4x) |

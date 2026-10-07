@@ -40,6 +40,7 @@ struct Payload {
 }
 
 /// An operator-provisioned verification key. No remote key discovery is performed.
+#[derive(Clone)]
 pub struct TrustedKey {
     /// Public key bytes, never signing material.
     pub public_key: [u8; 32],
@@ -50,6 +51,7 @@ pub struct TrustedKey {
 }
 
 /// A current Registry registration for one delegation edge.
+#[derive(Clone)]
 pub struct Delegation {
     /// Unique registration identifier, never selected by an untrusted chain.
     pub registration_id: String,
@@ -89,6 +91,7 @@ pub struct Delegation {
 ///
 /// Never deserialize this context from the principal's request. Keys and registrations
 /// must come from a current authoritative snapshot for this tenant, task and policy.
+#[derive(Clone)]
 pub struct Trust {
     /// Expected deployment.
     pub deployment: String,
@@ -260,6 +263,8 @@ pub fn verify(chain: &[String], trust: &Trust) -> Result<Principal, Error> {
             || p.iat > p.nbf
             || p.iat < 0
             || !current(p.nbf, p.exp, trust.now)
+            || p.nbf < trust.not_before
+            || p.exp > trust.expires
             || p.exp.checked_sub(p.iat).is_none_or(|l| l > 60)
             || ![
                 &p.deployment,
@@ -309,7 +314,7 @@ pub fn verify(chain: &[String], trust: &Trust) -> Result<Principal, Error> {
                         && d.policy_digest == trust.policy_digest
                         && d.from == parent.actor
                         && d.to == p.actor
-                        && d.service == trust.peer_service
+                        && d.service == p.service
                 })
                 .collect();
             if registrations.len() != 1 {
@@ -336,9 +341,6 @@ pub fn verify(chain: &[String], trust: &Trust) -> Result<Principal, Error> {
     }
     let leaf = previous.ok_or(Error::Identity)?;
     if leaf.service != trust.peer_service {
-        return Err(Error::Identity);
-    }
-    if leaf.nbf < trust.not_before || leaf.exp > trust.expires {
         return Err(Error::Identity);
     }
     Ok(Principal {
