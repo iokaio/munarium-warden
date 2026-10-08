@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Identity and activation participant service. No grant, broker or connector route is mounted.
+//! Identity, activation and opt-in prepared release grant/custody service.
 mod activation_service;
 mod delivery_service;
+mod grant_service;
 mod service_transport;
 use axum::{
     Json, Router,
@@ -25,6 +26,7 @@ use zeroize::Zeroizing;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Config {
+    broker: Option<grant_service::BrokerConfig>,
     delivery: Option<delivery_service::Config>,
     tls: TlsConfig,
     server_endpoint: String,
@@ -210,6 +212,8 @@ async fn run() -> Result<(), Failure> {
     let router = Router::new()
         .route("/v1/identity", post(issue))
         .route("/v1/activation", post(activation_service::operate))
+        .route("/v1/grants", post(grant_service::operate))
+        .route("/v1/custody", post(grant_service::custody))
         .layer(DefaultBodyLimit::max(65536))
         .with_state(runtime);
     axum::serve(

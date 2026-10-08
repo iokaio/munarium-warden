@@ -10,12 +10,14 @@ within a measured bound. It does not replace the enterprise identity provider or
 > **Status: Stage 1 identity service implemented.** The authenticated service/client
 > profile is implemented and covered by component and separate-process tests.
 > See the [service profile](docs/service-profile.md). Candidates remain inactive;
-> no execution endpoint is mounted. Human acceptance and production qualification
+> the Stage 1 API remains identity-only. Human acceptance and production qualification
 > remain pending.
 
 An experimental [Stage 2 activation participant](docs/activation-profile.md) now
 adds durable expected-head application and exact receipts. It is separate from
-the grant-library experiment and does not enable execution.
+the original grant-library experiment. The opt-in
+[prepared release adapter](docs/activation-profile.md) adds live issuance and
+connector-only OpenBao custody for disposable integration tests.
 
 Warden is one of nine components built around the existing Munarium foundation, Munarium Server
 and Munarium Matrix. Their shared architecture, normative contracts, decision records, roadmap and

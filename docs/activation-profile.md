@@ -109,3 +109,35 @@ This is audit delivery, not execution admission or snapshot reconciliation. Miss
 source history and changed generations fail closed. Component restart/negative
 acknowledgement tests and Harness's real-service delivery test exercise this path.
 No production trust, target effect or recovery qualification is claimed.
+
+## Prepared release grant and custody adapter
+
+The opt-in `/v1/grants` and `/v1/custody` routes require Server's current signed
+`execution:<service>` binding: `scope`, enrolled `gate` and `connector`, dedicated
+`stream`/`generation`, external `recovery`, exact `target` and `blocked` operation
+IDs. Without that binding they refuse. The actual mTLS peer, not a supplied worker
+name, determines which operation may run. Gate alone issues/validates; the enrolled
+connector alone receives credential bytes from the separate custody endpoint.
+
+Issuance independently fetches Gate's claim and exact Server custody plus Council's
+current approval. The local activation set must match. SQLite commits the original
+thirty-second grant and canonical `grant-issued` event together. Lost replies,
+restart and retry preserve the original expiry and bytes. `flush` delivers pending
+issuance evidence even after expiry without creating current authority.
+
+Custody requires actual consumption, the owning connector/fence, exact predispatch
+acknowledgement, current approval, unblocked operation and matching recovery. It
+binds one invocation for at most five seconds; retry cannot renew it. Optional
+operator configuration `broker` pins `endpoint`, `token_file` and `resource` for
+OpenBao KV v2. `loopback_test:true` only permits the existing literal-loopback HTTP
+disposable test constructor. Credentials are returned as a non-cacheable binary
+response on the connector-authenticated custody endpoint, never in a grant or audit
+record. The adapter revalidates after provider I/O and before returning bytes.
+
+The existing generic authority/broker APIs remain compatible. This new single-node
+SQLite adapter is experimental; mTLS enrollment is not proof of OS isolation.
+Restored stores cannot choose their own recovery generation or renew old grants.
+Automatic rollback detection and reconciled reopening are not implemented here.
+Harness provides real-service PostgreSQL/SQLite/OpenBao/target composition evidence;
+component tests cover immutable issuance, custody binding, expiry and generation
+refusals. No production credential or target is authorized by these tests.

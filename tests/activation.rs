@@ -252,3 +252,84 @@ fn delivery_retries_exact_event_and_rejects_wrong_custody() {
     );
     assert!(!db.pending(&a.scope).unwrap().is_empty());
 }
+
+#[test]
+fn live_grant_immutable_issuance_custody_expiry_and_recovery() {
+    use munarium_warden::live_grants::Issuance;
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("grants.sqlite");
+    let v = fixture();
+    let t = &v["records"]["activation"];
+    let a = authority(t);
+    let scope = &a.scope;
+    let mut db = Store::open(&path).unwrap();
+    db.initialize(scope, 1, t["prior_artifact_set_digest"].as_str().unwrap())
+        .unwrap();
+    db.apply(&a, t, &evidence(t)).unwrap();
+    let claim = &v["records"]["claim-created"];
+    let mut ack = v["records"]["ack"].clone();
+    ack["event_id"] = claim["event_id"].clone();
+    ack["event_digest"] = json!(wire::digest("accountability-event", claim).unwrap());
+    ack["payload_digest"] = claim["payload_digest"].clone();
+    let mut input = Issuance {
+        lookup: json!({"binding":{"request":v["records"]["request"],"approval":v["records"]["approval"]},"claim":claim,"claim_audit":{"acknowledgement":ack}}),
+        approval: json!({"approval":v["records"]["approval"],"currently_usable":true,"status":"approved","revision":1}),
+        now: 1000,
+        stream: "live-grants".into(),
+        generation: 1,
+        recovery: 1,
+    };
+    let original = db.grant_issue(&input).unwrap();
+    wire::shape(&original["event"], "accountability-event").unwrap();
+    drop(db);
+    let mut db = Store::open(&path).unwrap();
+    input.now = 1001;
+    assert_eq!(db.grant_issue(&input).unwrap(), original);
+    input.approval["currently_usable"] = json!(false);
+    assert!(db.grant_issue(&input).is_err());
+    input.approval["currently_usable"] = json!(true);
+    input.recovery = 2;
+    assert!(db.grant_issue(&input).is_err());
+    input.recovery = 1;
+    let ticket = json!({"connector":"connector","invocation":{"scope":scope,"kind":"invocation","id":"one"},"expires_at":1005});
+    assert_eq!(
+        db.grant_custody(scope, "publish-artifact", &ticket)
+            .unwrap(),
+        ticket
+    );
+    let mut changed = ticket.clone();
+    changed["expires_at"] = json!(1009);
+    assert_eq!(
+        db.grant_custody(scope, "publish-artifact", &changed)
+            .unwrap(),
+        ticket,
+        "lost custody cannot renew expiry"
+    );
+    changed["invocation"]["id"] = json!("two");
+    assert!(
+        db.grant_custody(scope, "publish-artifact", &changed)
+            .is_err()
+    );
+    input.now = 1028;
+    assert!(
+        db.grant_issue(&input).is_err(),
+        "expired original cannot mint successor"
+    );
+    assert_eq!(
+        db.grant_pending(scope).unwrap(),
+        Some(original["event"].clone()),
+        "expired issuance still has deliverable audit intent"
+    );
+    let mut ack = v["records"]["ack"].clone();
+    assert!(db.grant_ack(scope, "publish-artifact", &ack).is_err());
+    ack["event_id"] = original["event"]["event_id"].clone();
+    ack["event_digest"] = json!(wire::digest("accountability-event", &original["event"]).unwrap());
+    ack["payload_digest"] = original["event"]["payload_digest"].clone();
+    db.grant_ack(scope, "publish-artifact", &ack).unwrap();
+    assert_eq!(db.grant_pending(scope).unwrap(), None);
+    ack["position"] = json!(999);
+    assert!(
+        db.grant_ack(scope, "publish-artifact", &ack).is_err(),
+        "original custody cannot be overwritten"
+    );
+}
