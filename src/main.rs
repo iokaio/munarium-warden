@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Identity and activation participant service. No grant, broker or connector route is mounted.
 mod activation_service;
+mod delivery_service;
 mod service_transport;
 use axum::{
     Json, Router,
@@ -24,6 +25,7 @@ use zeroize::Zeroizing;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Config {
+    delivery: Option<delivery_service::Config>,
     tls: TlsConfig,
     server_endpoint: String,
     deployment: String,

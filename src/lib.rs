@@ -27,3 +27,6 @@ pub mod identity;
 pub mod policy;
 pub mod principal;
 pub mod revocation;
+
+/// Durable participant event construction and custody validation.
+pub mod activation_delivery;
