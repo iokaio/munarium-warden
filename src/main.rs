@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Warden's decision-only service. No grant, broker or connector route is mounted.
+//! Identity and activation participant service. No grant, broker or connector route is mounted.
+mod activation_service;
 mod service_transport;
 use axum::{
     Json, Router,
@@ -28,12 +29,14 @@ struct Config {
     deployment: String,
     signing_key_file: PathBuf,
     key_id: String,
+    activation: Option<activation_service::Config>,
 }
 struct Runtime {
     config: Config,
     client: reqwest::Client,
     signer: SigningKey,
     permits: tokio::sync::Semaphore,
+    activation: Option<tokio::sync::Mutex<munarium_warden::activation::Store>>,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -193,15 +196,18 @@ async fn run() -> Result<(), Failure> {
         .map_err(|_| Failure::Configuration)?;
     let signer = SigningKey::from_bytes(bytes);
     let client = service_transport::client(&config.tls)?;
+    let activation = activation_service::open(&config.activation)?;
     let listener = service_transport::Mtls::bind(&config.tls).await?;
     let runtime = Arc::new(Runtime {
         config,
         client,
         signer,
         permits: tokio::sync::Semaphore::new(32),
+        activation,
     });
     let router = Router::new()
         .route("/v1/identity", post(issue))
+        .route("/v1/activation", post(activation_service::operate))
         .layer(DefaultBodyLimit::max(65536))
         .with_state(runtime);
     axum::serve(
