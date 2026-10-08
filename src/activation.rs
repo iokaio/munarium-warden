@@ -23,7 +23,7 @@ pub struct Evidence {
 }
 /// Owner-local durable participant and retained outbox.
 pub struct Store {
-    db: Connection,
+    pub(crate) db: Connection,
 }
 impl Store {
     /// Open additive participant tables with WAL and full synchronous durability.
@@ -35,6 +35,7 @@ impl Store {
           CREATE TABLE IF NOT EXISTS stage2_transitions(scope TEXT NOT NULL,id TEXT NOT NULL,record TEXT NOT NULL,receipt TEXT NOT NULL,PRIMARY KEY(scope,id));
           CREATE TABLE IF NOT EXISTS stage2_outbox(sequence INTEGER PRIMARY KEY,scope TEXT NOT NULL,id TEXT NOT NULL,record TEXT NOT NULL,receipt TEXT NOT NULL,UNIQUE(scope,id));")?;
         db.execute_batch("CREATE TABLE IF NOT EXISTS activation_delivery(scope TEXT NOT NULL,id TEXT NOT NULL,sequence INTEGER NOT NULL,event TEXT NOT NULL,acknowledgement TEXT,PRIMARY KEY(scope,id),UNIQUE(scope,sequence));")?;
+        db.execute_batch(include_str!("../migrations/0002_grants.sql"))?;
         Ok(Self { db })
     }
     /// Enroll once; later configuration cannot reset an evolved or differently enrolled head.

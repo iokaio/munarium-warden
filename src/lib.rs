@@ -15,6 +15,7 @@
 
 pub mod activation;
 pub mod activation_wire;
+pub mod live_grants;
 
 pub mod admission;
 pub mod authority;
