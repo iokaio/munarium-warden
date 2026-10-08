@@ -27,6 +27,7 @@ struct Policy {
 #[derive(Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 enum Operation {
+    Flush,
     Apply { transition: String },
     Lookup { transition_id: String },
     Head,
@@ -110,6 +111,35 @@ async fn admitted(runtime: &Runtime, peer: &Peer, body: &[u8]) -> Result<Value, 
     }
     if peer.service != policy.coordinator {
         return Err(Error::Refused);
+    }
+    if matches!(r.action, Operation::Flush) {
+        let delivery = runtime.config.delivery.as_ref().ok_or(Error::Unavailable)?;
+        let registration = munarium_warden::activation_delivery::registration(
+            &state,
+            &policy.scope,
+            &delivery.server_service,
+            &cfg.service,
+            "warden",
+        )?;
+        let now = service_transport::now()
+            .map_err(|_| Error::Unavailable)?
+            .try_into()
+            .map_err(|_| Error::Unavailable)?;
+        let event = store
+            .lock()
+            .await
+            .delivery_next(&policy.scope, &registration, now)?;
+        let Some(event) = event else {
+            return Ok(json!({"delivered":0}));
+        };
+        let ack = delivery_service::deliver(runtime, &r.tenant, &event)
+            .await
+            .map_err(|_| Error::Unavailable)?;
+        store
+            .lock()
+            .await
+            .delivery_ack(&policy.scope, &event, &ack)?;
+        return Ok(json!({"delivered":1,"acknowledgement":ack}));
     }
     let Operation::Apply { transition } = r.action else {
         return Err(Error::Invalid);

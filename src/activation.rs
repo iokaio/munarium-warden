@@ -3,6 +3,7 @@
 use crate::activation_wire::{self as wire, Authority, Error, Result};
 use rusqlite::{Connection, OptionalExtension, TransactionBehavior, params};
 use serde_json::{Value, json};
+mod delivery;
 use std::path::Path;
 impl From<rusqlite::Error> for Error {
     fn from(_: rusqlite::Error) -> Self {
@@ -33,6 +34,7 @@ impl Store {
           CREATE TABLE IF NOT EXISTS stage2_cells(scope TEXT PRIMARY KEY,initial_epoch INTEGER NOT NULL,initial_digest TEXT NOT NULL,epoch INTEGER NOT NULL,digest TEXT NOT NULL);
           CREATE TABLE IF NOT EXISTS stage2_transitions(scope TEXT NOT NULL,id TEXT NOT NULL,record TEXT NOT NULL,receipt TEXT NOT NULL,PRIMARY KEY(scope,id));
           CREATE TABLE IF NOT EXISTS stage2_outbox(sequence INTEGER PRIMARY KEY,scope TEXT NOT NULL,id TEXT NOT NULL,record TEXT NOT NULL,receipt TEXT NOT NULL,UNIQUE(scope,id));")?;
+        db.execute_batch("CREATE TABLE IF NOT EXISTS activation_delivery(scope TEXT NOT NULL,id TEXT NOT NULL,sequence INTEGER NOT NULL,event TEXT NOT NULL,acknowledgement TEXT,PRIMARY KEY(scope,id),UNIQUE(scope,sequence));")?;
         Ok(Self { db })
     }
     /// Enroll once; later configuration cannot reset an evolved or differently enrolled head.
