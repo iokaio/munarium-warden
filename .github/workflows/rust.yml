@@ -33,6 +33,8 @@ jobs:
         run: cargo +1.98.1 clippy --offline --locked --all-targets -- -D warnings
       - name: Test
         run: cargo +1.98.1 test --offline --locked
+      - name: Native mTLS activation participant
+        run: python3 scripts/test_activation_service.py -v
       - name: Identity-only package
         run: |
           cargo +1.98.1 fetch --manifest-path identity-core/Cargo.toml --locked

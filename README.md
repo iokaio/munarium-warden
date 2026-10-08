@@ -13,6 +13,10 @@ within a measured bound. It does not replace the enterprise identity provider or
 > no execution endpoint is mounted. Human acceptance and production qualification
 > remain pending.
 
+An experimental [Stage 2 activation participant](docs/activation-profile.md) now
+adds durable expected-head application and exact receipts. It is separate from
+the grant-library experiment and does not enable execution.
+
 Warden is one of nine components built around the existing Munarium foundation, Munarium Server
 and Munarium Matrix. Their shared architecture, normative contracts, decision records, roadmap and
 composition evidence live in the public hub,

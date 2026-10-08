@@ -13,6 +13,9 @@
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 
+pub mod activation;
+pub mod activation_wire;
+
 pub mod admission;
 pub mod authority;
 pub mod broker;
